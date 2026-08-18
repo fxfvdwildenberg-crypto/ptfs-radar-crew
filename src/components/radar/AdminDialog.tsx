@@ -33,10 +33,14 @@ export function AdminDialog({
   open,
   onOpenChange,
   initialIcao,
+  pendingPoint,
+  onRequestPlace,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   initialIcao?: string | null;
+  pendingPoint?: { x: number; y: number } | null;
+  onRequestPlace?: (() => void) | undefined;
 }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<string | null>(initialIcao ?? null);
@@ -55,6 +59,7 @@ export function AdminDialog({
     () => airports.find((a) => a.icao === editing) ?? null,
     [airports, editing],
   );
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
