@@ -5,17 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * ATC365 design system — dark aviation / radar console.
+ * All colors are oklch semantic tokens. Never hardcode colors in components.
  */
 
 @theme inline {
@@ -46,6 +37,15 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-ocean: var(--ocean);
+  --color-ocean-deep: var(--ocean-deep);
+  --color-land: var(--land);
+  --color-land-hi: var(--land-hi);
+  --color-land-dry: var(--land-dry);
+  --color-tarmac: var(--tarmac);
+  --color-airborne: var(--airborne);
+  --color-ground: var(--ground);
+  --color-scheduled: var(--scheduled);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -59,82 +59,71 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Barlow", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.17 0.03 250);
-  --foreground: oklch(0.95 0.01 240);
-  --card: oklch(0.21 0.035 252);
-  --card-foreground: oklch(0.95 0.01 240);
-  --popover: oklch(0.21 0.035 252);
-  --popover-foreground: oklch(0.95 0.01 240);
-  --primary: oklch(0.78 0.16 195);
-  --primary-foreground: oklch(0.17 0.03 250);
-  --secondary: oklch(0.27 0.04 252);
-  --secondary-foreground: oklch(0.95 0.01 240);
-  --muted: oklch(0.25 0.03 252);
-  --muted-foreground: oklch(0.7 0.03 240);
-  --accent: oklch(0.82 0.16 85);
-  --accent-foreground: oklch(0.17 0.03 250);
-  --destructive: oklch(0.63 0.22 22);
-  --destructive-foreground: oklch(0.98 0.01 240);
-  --border: oklch(0.31 0.04 252);
-  --input: oklch(0.31 0.04 252);
-  --ring: oklch(0.78 0.16 195);
-  --chart-1: oklch(0.78 0.16 195);
-  --chart-2: oklch(0.82 0.16 85);
-  --chart-3: oklch(0.7 0.15 145);
-  --chart-4: oklch(0.63 0.22 22);
-  --chart-5: oklch(0.75 0.1 260);
-  --sidebar: oklch(0.19 0.03 252);
-  --sidebar-foreground: oklch(0.95 0.01 240);
-  --sidebar-primary: oklch(0.78 0.16 195);
-  --sidebar-primary-foreground: oklch(0.17 0.03 250);
-  --sidebar-accent: oklch(0.27 0.04 252);
-  --sidebar-accent-foreground: oklch(0.95 0.01 240);
-  --sidebar-border: oklch(0.31 0.04 252);
-  --sidebar-ring: oklch(0.78 0.16 195);
-  --radar-grid: oklch(0.3 0.04 200 / 45%);
-  --radar-target: oklch(0.85 0.18 150);
-  --radar-ground: oklch(0.7 0.03 240);
-  --radar-emergency: oklch(0.68 0.24 22);
+
+  --background: oklch(0.19 0.008 260);
+  --foreground: oklch(0.96 0.004 260);
+  --card: oklch(0.23 0.009 260);
+  --card-foreground: oklch(0.96 0.004 260);
+  --popover: oklch(0.21 0.009 260);
+  --popover-foreground: oklch(0.96 0.004 260);
+
+  /* Signature amber — runway / ATIS light */
+  --primary: oklch(0.82 0.16 85);
+  --primary-foreground: oklch(0.2 0.03 80);
+
+  --secondary: oklch(0.29 0.012 260);
+  --secondary-foreground: oklch(0.95 0.004 260);
+  --muted: oklch(0.27 0.011 260);
+  --muted-foreground: oklch(0.68 0.012 260);
+  --accent: oklch(0.32 0.014 260);
+  --accent-foreground: oklch(0.97 0.004 260);
+  --destructive: oklch(0.6 0.21 27);
+  --destructive-foreground: oklch(0.98 0.003 260);
+  --border: oklch(0.32 0.012 260);
+  --input: oklch(0.3 0.012 260);
+  --ring: oklch(0.82 0.16 85);
+
+  /* Map palette — deep in-game ocean */
+  --ocean: oklch(0.33 0.05 250);
+  --ocean-deep: oklch(0.24 0.045 252);
+  --land: oklch(0.62 0.13 143);
+  --land-hi: oklch(0.7 0.14 140);
+  --land-dry: oklch(0.79 0.07 105);
+  --tarmac: oklch(0.55 0.006 260);
+
+  /* Flight states */
+  --airborne: oklch(0.82 0.16 85);
+  --ground: oklch(0.72 0.13 200);
+  --scheduled: oklch(0.68 0.01 260);
+
+  --chart-1: oklch(0.82 0.16 85);
+  --chart-2: oklch(0.72 0.13 200);
+  --chart-3: oklch(0.68 0.15 145);
+  --chart-4: oklch(0.65 0.19 27);
+  --chart-5: oklch(0.7 0.13 300);
+
+  --sidebar: oklch(0.21 0.009 260);
+  --sidebar-foreground: oklch(0.95 0.004 260);
+  --sidebar-primary: oklch(0.82 0.16 85);
+  --sidebar-primary-foreground: oklch(0.2 0.03 80);
+  --sidebar-accent: oklch(0.29 0.012 260);
+  --sidebar-accent-foreground: oklch(0.96 0.004 260);
+  --sidebar-border: oklch(0.32 0.012 260);
+  --sidebar-ring: oklch(0.82 0.16 85);
+
+  --shadow-panel: 0 18px 45px -18px oklch(0 0 0 / 0.75);
+  --shadow-glow: 0 0 24px -4px color-mix(in oklab, var(--primary) 55%, transparent);
 }
 
-
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  color-scheme: dark;
 }
 
 @layer base {
@@ -142,8 +131,89 @@
     border-color: var(--color-border);
   }
 
+  html,
+  body {
+    height: 100%;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
   }
 }
+
+@utility panel {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-panel);
+}
+
+@utility text-glow {
+  text-shadow: 0 0 18px color-mix(in oklab, var(--primary) 45%, transparent);
+}
+
+@utility tracking-console {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@keyframes radar-ping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-fade-rise {
+  animation: fade-rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-radar-ping {
+  animation: radar-ping 2.4s ease-out infinite;
+}
+
+/* ---- Ocean + weather -------------------------------------------- */
+@keyframes water-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0.6%, 0.4%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+.water-drift { animation: water-drift 14s ease-in-out infinite; }
+
+/* World-anchored cloud drift (SVG groups, world units). */
+@keyframes cloud-drift-world {
+  from { transform: translate3d(-60px, 0, 0); }
+  to { transform: translate3d(60px, 0, 0); }
+}
+.cloud-drift-svg {
+  will-change: transform;
+  animation: cloud-drift-world linear infinite alternate;
+}
+
+
