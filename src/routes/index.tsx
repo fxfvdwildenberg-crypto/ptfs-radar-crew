@@ -94,6 +94,10 @@ function RadarPage() {
   const [atisOpen, setAtisOpen] = useState(false);
   const [atcOpen, setAtcOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
+  const [acarsOpen, setAcarsOpen] = useState(false);
+  const [placing, setPlacing] = useState(false);
+  const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null);
+
   const [regionsOpen, setRegionsOpen] = useState(false);
   const [showClouds, setShowClouds] = useState(false);
   const [showRoutes, setShowRoutes] = useState(true);
