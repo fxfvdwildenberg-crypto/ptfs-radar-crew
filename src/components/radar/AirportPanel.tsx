@@ -150,12 +150,14 @@ export function AirportPanel({
       </div>
 
       <Tabs defaultValue="atis" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 rounded-none border-b border-border bg-transparent p-0">
+        <TabsList className="grid w-full grid-cols-5 rounded-none border-b border-border bg-transparent p-0">
           {[
             ["atis", <Radio key="i" className="mr-1.5 size-4" />, "ATIS"],
+            ["charts", <MapIcon key="i" className="mr-1.5 size-4" />, "Charts"],
             ["info", <Plane key="i" className="mr-1.5 size-4" />, "Info"],
             ["dep", <PlaneTakeoff key="i" className="mr-1.5 size-4" />, "Dep"],
             ["arr", <PlaneLanding key="i" className="mr-1.5 size-4" />, "Arr"],
+
           ].map(([value, icon, label]) => (
             <TabsTrigger
               key={value as string}
