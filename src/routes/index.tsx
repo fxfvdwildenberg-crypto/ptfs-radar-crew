@@ -40,6 +40,8 @@ import { FlightPlanDialog } from "@/components/radar/FlightPlanDialog";
 import { AtisDialog } from "@/components/radar/AtisDialog";
 import { AtcOnlineDialog } from "@/components/radar/AtcOnlineDialog";
 import { AdminDialog } from "@/components/radar/AdminDialog";
+import { AcarsDialog } from "@/components/radar/AcarsDialog";
+
 import { WidgetDeck, WIDGETS, type WidgetKey } from "@/components/radar/WidgetDeck";
 import { Tutorial, resetTutorial } from "@/components/Tutorial";
 import { Logo } from "@/components/Logo";
