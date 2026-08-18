@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
+  ExternalLink,
+  Map as MapIcon,
   Pencil,
   Plane,
   PlaneLanding,
@@ -11,6 +13,7 @@ import {
   Volume2,
   X,
 } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { airportByIcao } from "@/lib/world";
 import { formatHm, phaseLabel, type LiveFlight } from "@/lib/flights";
