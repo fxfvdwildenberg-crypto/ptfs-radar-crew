@@ -234,6 +234,12 @@ function AirportForm({
           onChange={(v) => set("elevation", Number(v) || 0)}
         />
       </div>
+      {onRequestPlace && (
+        <Button variant="secondary" className="w-full gap-2" onClick={onRequestPlace}>
+          <Crosshair className="size-4" /> Pick position on map
+        </Button>
+      )}
+
       <Field
         label="Airport photo URL"
         value={f.image_url ?? ""}
