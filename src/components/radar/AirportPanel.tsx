@@ -218,7 +218,37 @@ export function AirportPanel({
             )}
           </TabsContent>
 
+          <TabsContent value="charts" className="m-0 space-y-3 p-4">
+            {chartsFor(airport.icao).map((chart) =>
+              chart.kind === "image" ? (
+                <figure key={chart.key} className="space-y-2">
+                  <img
+                    src={chart.url}
+                    alt={`${airport.name} ground chart`}
+                    className="w-full rounded-lg border border-border bg-secondary/40"
+                    loading="lazy"
+                  />
+                  <figcaption className="font-mono text-[11px] text-muted-foreground">
+                    {chart.label}
+                  </figcaption>
+                </figure>
+              ) : (
+                <Button
+                  key={chart.key}
+                  asChild
+                  variant="secondary"
+                  className="w-full justify-start gap-2"
+                >
+                  <a href={chart.url} target="_blank" rel="noreferrer noopener">
+                    <ExternalLink className="size-4" /> {chart.label}
+                  </a>
+                </Button>
+              ),
+            )}
+          </TabsContent>
+
           <TabsContent value="info" className="m-0 space-y-3 p-4">
+
             {airport.image_url && (
               <img
                 src={airport.image_url}
