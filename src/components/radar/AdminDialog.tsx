@@ -80,15 +80,21 @@ export function AdminDialog({
             <ScrollArea className="max-h-[64vh]">
               <div className="space-y-4 p-4">
                 <AirportForm
-                  key={current?.icao ?? "new"}
-                  initial={current ?? EMPTY}
+                  key={`${current?.icao ?? "new"}-${pendingPoint ? `${pendingPoint.x},${pendingPoint.y}` : ""}`}
+                  initial={
+                    pendingPoint
+                      ? { ...(current ?? EMPTY), x: pendingPoint.x, y: pendingPoint.y }
+                      : (current ?? EMPTY)
+                  }
                   isNew={!current}
+                  onRequestPlace={onRequestPlace}
                   onDone={() => {
                     qc.invalidateQueries({ queryKey: ["admin_airports"] });
                     qc.invalidateQueries({ queryKey: ["airports"] });
                     setEditing(null);
                   }}
                 />
+
 
                 <div className="border-t border-border pt-3">
                   <div className="mb-2 flex items-center justify-between">
