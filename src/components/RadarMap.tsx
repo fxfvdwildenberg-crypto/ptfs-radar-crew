@@ -106,7 +106,7 @@ export function RadarMap({ aircraft, selected, onSelect }: Props) {
         ctx.stroke();
       }
 
-      if (v.zoom > 0.008 || isSel) {
+      if (v.zoom > 0.03 || isSel) {
         ctx.fillStyle = color;
         ctx.font = "11px ui-monospace, monospace";
         ctx.fillText(a.callsign, sx + 10, sy - 4);
