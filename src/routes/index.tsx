@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import {
   ChevronLeft,
   Cloud,
+  Crosshair,
   Download,
   Globe2,
   GraduationCap,
@@ -12,6 +13,7 @@ import {
   LayoutGrid,
   ListChecks,
   LogIn,
+  MessageSquare,
   Menu,
   Map as MapIcon,
   PlaneTakeoff,
@@ -21,6 +23,7 @@ import {
   Shield,
   UserRound,
 } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useAirportRegistry } from "@/lib/airports";
