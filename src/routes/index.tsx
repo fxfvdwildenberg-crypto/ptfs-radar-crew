@@ -444,7 +444,37 @@ function RadarPage() {
           }}
           onSelectAirport={openAirport}
           onSelectIsland={(slug) => setFocus(slug)}
+          placing={placing}
+          onMapClick={(x, y) => {
+            setPendingPoint({ x, y });
+            setPlacing(false);
+            setAdminOpen(true);
+            toast.success(`Position captured — ${x}, ${y}`);
+          }}
         />
+
+        {placing && (
+          <div className="pointer-events-none absolute inset-x-0 top-16 z-40 flex justify-center px-3">
+            <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-primary/60 bg-card/95 px-3 py-1.5 shadow-[var(--shadow-panel)] backdrop-blur">
+              <Crosshair className="size-4 text-primary" />
+              <span className="font-display text-[11px] tracking-console text-foreground">
+                Tap the map to place the airport
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 px-2"
+                onClick={() => {
+                  setPlacing(false);
+                  setAdminOpen(true);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
 
 
 
