@@ -160,11 +160,14 @@ function AirportForm({
   initial,
   isNew,
   onDone,
+  onRequestPlace,
 }: {
   initial: AirportRow;
   isNew: boolean;
   onDone: () => void;
+  onRequestPlace?: (() => void) | undefined;
 }) {
+
   const [f, setF] = useState<AirportRow>(initial);
   const set = <K extends keyof AirportRow>(k: K, v: AirportRow[K]) =>
     setF((p) => ({ ...p, [k]: v }));
