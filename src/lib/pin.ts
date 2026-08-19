@@ -52,21 +52,51 @@ function bar(progress: number) {
   return `${"━".repeat(filled)}✈${"┈".repeat(Math.max(14 - filled, 0))}`;
 }
 
-function notify(title: string, body: string, tag: string, sticky = false) {
-  if (typeof Notification === "undefined" || Notification.permission !== "granted") return null;
+const STICKY_TAG = "atc365-pinned-flight";
+
+/**
+ * Shows a notification through the service worker registration. Mobile
+ * browsers (Android Chrome in particular) refuse `new Notification(...)`, so
+ * `registration.showNotification` is the only path that works there. The
+ * constructor stays as a desktop fallback when no worker is available.
+ */
+async function notify(title: string, body: string, tag: string, sticky = false) {
+  if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+  const options: NotificationOptions = {
+    body,
+    tag,
+    icon: "/favicon.ico",
+    badge: "/favicon.ico",
+    silent: sticky,
+    requireInteraction: sticky,
+  };
   try {
-    return new Notification(title, {
-      body,
-      tag,
-      icon: "/favicon.ico",
-      badge: "/favicon.ico",
-      silent: sticky,
-      requireInteraction: sticky,
-    });
+    const registration = await getPushRegistration();
+    if (registration) {
+      await registration.showNotification(title, options);
+      return;
+    }
   } catch {
-    return null;
+    /* fall through to the constructor */
+  }
+  try {
+    new Notification(title, options);
+  } catch {
+    /* notifications unavailable */
   }
 }
+
+async function closeNotifications(tag: string) {
+  try {
+    const registration = await getPushRegistration();
+    if (!registration) return;
+    const open = await registration.getNotifications({ tag });
+    open.forEach((n) => n.close());
+  } catch {
+    /* nothing to close */
+  }
+}
+
 
 /**
  * Keeps a single sticky "live activity" notification in sync with the pinned
