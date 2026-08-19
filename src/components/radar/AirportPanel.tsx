@@ -31,7 +31,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 export function AirportPanel({
@@ -93,8 +92,11 @@ export function AirportPanel({
   };
 
   return (
-    <div className="panel animate-fade-rise absolute inset-x-0 bottom-0 z-30 max-h-[74vh] overflow-hidden rounded-t-2xl">
-      <div className="flex items-start justify-between gap-3 border-b border-border px-4 pt-4 pb-3">
+    <div className="deck-surface animate-deck-in absolute inset-x-0 bottom-0 z-30 max-h-[82dvh] overflow-hidden rounded-t-3xl">
+      <div className="flex justify-center pt-2.5 pb-1">
+        <span className="sheet-grab" />
+      </div>
+      <div className="deck-hairline flex items-start justify-between gap-3 px-4 pt-2 pb-3">
         <div className="min-w-0">
           <h2 className="font-display text-2xl leading-none font-semibold text-primary text-glow">
             {airport.name}
@@ -174,7 +176,7 @@ export function AirportPanel({
           ))}
         </TabsList>
 
-        <ScrollArea className="max-h-[44vh]">
+        <div className="deck-fade-y max-h-[52dvh] overflow-x-hidden overflow-y-auto overscroll-contain">
           <TabsContent value="atis" className="m-0 p-4">
             {atis ? (
               <div className="space-y-3">
@@ -297,7 +299,7 @@ export function AirportPanel({
           <TabsContent value="arr" className="m-0">
             <FlightRows list={arrivals} mode="arr" onSelectFlight={onSelectFlight} />
           </TabsContent>
-        </ScrollArea>
+        </div>
       </Tabs>
     </div>
   );
