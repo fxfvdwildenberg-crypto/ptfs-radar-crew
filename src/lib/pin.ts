@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { getPushRegistration } from "./push";
 
 /**
  * "Pin" a flight so its callsign and progress stay visible outside the app —
@@ -91,7 +92,7 @@ async function closeNotifications(tag: string) {
     const registration = await getPushRegistration();
     if (!registration) return;
     const open = await registration.getNotifications({ tag });
-    open.forEach((n) => n.close());
+    open.forEach((n: Notification) => n.close());
   } catch {
     /* nothing to close */
   }
@@ -103,15 +104,13 @@ async function closeNotifications(tag: string) {
  * flight, and fires one-off alerts on takeoff, landing and emergencies.
  */
 export function useFlightPinNotification(info: PinnedInfo | null, active: boolean) {
-  const ref = useRef<Notification | null>(null);
   const lastPhase = useRef<string | null>(null);
   const lastEmergency = useRef(false);
   const lastId = useRef<string | null>(null);
 
   useEffect(() => {
     if (!active || !info) {
-      ref.current?.close();
-      ref.current = null;
+      void closeNotifications(STICKY_TAG);
       lastPhase.current = null;
       lastEmergency.current = false;
       lastId.current = null;
@@ -163,16 +162,15 @@ export function useFlightPinNotification(info: PinnedInfo | null, active: boolea
     lastPhase.current = info.phase;
 
     // --- live activity -----------------------------------------------------
-    ref.current?.close();
-    ref.current = notify(
+    void notify(
       `${info.callsign}   ${info.depIcao} → ${info.arrIcao}`,
       `${info.depTime} ${bar(info.progress)} ${info.arrTime}\n${info.eta}`,
-      "atc365-pinned-flight",
+      STICKY_TAG,
       true,
     );
 
     return () => {
-      ref.current?.close();
+      void closeNotifications(STICKY_TAG);
     };
   }, [
     active,
