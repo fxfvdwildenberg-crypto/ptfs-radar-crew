@@ -148,6 +148,27 @@ export type Database = {
         }
         Relationships: []
       }
+      atc_bans: {
+        Row: {
+          banned_by: string | null
+          created_at: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          banned_by?: string | null
+          created_at?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          banned_by?: string | null
+          created_at?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       atc_sessions: {
         Row: {
           airport_icao: string
@@ -456,6 +477,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_approve_flight_plans: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -463,6 +485,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_atc_banned: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "atc" | "pilot"
