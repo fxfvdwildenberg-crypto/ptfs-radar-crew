@@ -300,6 +300,7 @@ export type Database = {
       flight_plans: {
         Row: {
           aircraft: string
+          aircraft_icao: string | null
           airline: string | null
           alternate_icao: string | null
           arr_icao: string
@@ -312,7 +313,11 @@ export type Database = {
           cruise_speed: number
           dep_icao: string
           dep_time: string
+          flight_rules: string
+          flight_type: string
           id: string
+          registration: string | null
+          remarks: string | null
           route: string | null
           squawk: string
           status: string
@@ -321,6 +326,7 @@ export type Database = {
         }
         Insert: {
           aircraft?: string
+          aircraft_icao?: string | null
           airline?: string | null
           alternate_icao?: string | null
           arr_icao: string
@@ -333,7 +339,11 @@ export type Database = {
           cruise_speed?: number
           dep_icao: string
           dep_time: string
+          flight_rules?: string
+          flight_type?: string
           id?: string
+          registration?: string | null
+          remarks?: string | null
           route?: string | null
           squawk?: string
           status?: string
@@ -342,6 +352,7 @@ export type Database = {
         }
         Update: {
           aircraft?: string
+          aircraft_icao?: string | null
           airline?: string | null
           alternate_icao?: string | null
           arr_icao?: string
@@ -354,7 +365,11 @@ export type Database = {
           cruise_speed?: number
           dep_icao?: string
           dep_time?: string
+          flight_rules?: string
+          flight_type?: string
           id?: string
+          registration?: string | null
+          remarks?: string | null
           route?: string | null
           squawk?: string
           status?: string
@@ -527,7 +542,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      random_squawk: { Args: never; Returns: string }
+      is_atc_banned: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "atc" | "pilot"
