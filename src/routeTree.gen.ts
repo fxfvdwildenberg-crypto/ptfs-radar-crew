@@ -14,6 +14,8 @@ import { Route as AtcRouteImport } from './routes/atc'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MyFlightsRouteImport } from './routes/my-flights'
 import { Route as ApiPublicPushFlightEventsRouteImport } from './routes/api/public/push/flight-events'
+import { Route as ApiPublicAuthDiscordCallbackRouteImport } from './routes/api/public/auth/discord/callback'
+import { Route as ApiPublicAuthDiscordStartRouteImport } from './routes/api/public/auth/discord/start'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,6 +43,18 @@ const ApiPublicPushFlightEventsRoute =
     path: '/api/public/push/flight-events',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAuthDiscordCallbackRoute =
+  ApiPublicAuthDiscordCallbackRouteImport.update({
+    id: '/api/public/auth/discord/callback',
+    path: '/api/public/auth/discord/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAuthDiscordStartRoute =
+  ApiPublicAuthDiscordStartRouteImport.update({
+    id: '/api/public/auth/discord/start',
+    path: '/api/public/auth/discord/start',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -48,6 +62,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/my-flights': typeof MyFlightsRoute
   '/api/public/push/flight-events': typeof ApiPublicPushFlightEventsRoute
+  '/api/public/auth/discord/callback': typeof ApiPublicAuthDiscordCallbackRoute
+  '/api/public/auth/discord/start': typeof ApiPublicAuthDiscordStartRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -55,6 +71,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/my-flights': typeof MyFlightsRoute
   '/api/public/push/flight-events': typeof ApiPublicPushFlightEventsRoute
+  '/api/public/auth/discord/callback': typeof ApiPublicAuthDiscordCallbackRoute
+  '/api/public/auth/discord/start': typeof ApiPublicAuthDiscordStartRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -63,13 +81,28 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/my-flights': typeof MyFlightsRoute
   '/api/public/push/flight-events': typeof ApiPublicPushFlightEventsRoute
+  '/api/public/auth/discord/callback': typeof ApiPublicAuthDiscordCallbackRoute
+  '/api/public/auth/discord/start': typeof ApiPublicAuthDiscordStartRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/atc' | '/auth' | '/my-flights' | '/api/public/push/flight-events'
+    | '/'
+    | '/atc'
+    | '/auth'
+    | '/my-flights'
+    | '/api/public/push/flight-events'
+    | '/api/public/auth/discord/callback'
+    | '/api/public/auth/discord/start'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/atc' | '/auth' | '/my-flights' | '/api/public/push/flight-events'
+  to:
+    | '/'
+    | '/atc'
+    | '/auth'
+    | '/my-flights'
+    | '/api/public/push/flight-events'
+    | '/api/public/auth/discord/callback'
+    | '/api/public/auth/discord/start'
   id:
     | '__root__'
     | '/'
@@ -77,6 +110,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/my-flights'
     | '/api/public/push/flight-events'
+    | '/api/public/auth/discord/callback'
+    | '/api/public/auth/discord/start'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -85,6 +120,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   MyFlightsRoute: typeof MyFlightsRoute
   ApiPublicPushFlightEventsRoute: typeof ApiPublicPushFlightEventsRoute
+  ApiPublicAuthDiscordCallbackRoute: typeof ApiPublicAuthDiscordCallbackRoute
+  ApiPublicAuthDiscordStartRoute: typeof ApiPublicAuthDiscordStartRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -124,6 +161,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPushFlightEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth/discord/callback': {
+      id: '/api/public/auth/discord/callback'
+      path: '/api/public/auth/discord/callback'
+      fullPath: '/api/public/auth/discord/callback'
+      preLoaderRoute: typeof ApiPublicAuthDiscordCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/auth/discord/start': {
+      id: '/api/public/auth/discord/start'
+      path: '/api/public/auth/discord/start'
+      fullPath: '/api/public/auth/discord/start'
+      preLoaderRoute: typeof ApiPublicAuthDiscordStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -133,6 +184,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   MyFlightsRoute: MyFlightsRoute,
   ApiPublicPushFlightEventsRoute: ApiPublicPushFlightEventsRoute,
+  ApiPublicAuthDiscordCallbackRoute: ApiPublicAuthDiscordCallbackRoute,
+  ApiPublicAuthDiscordStartRoute: ApiPublicAuthDiscordStartRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

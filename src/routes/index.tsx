@@ -34,6 +34,7 @@ import { computeFlight, formatHm, isVisibleOnRadar, type FlightPlan, type LiveFl
 import { isEmergencySquawk, squawkInfo } from "@/lib/squawk";
 import { CATEGORIES, categoryFor, type CategoryKey } from "@/lib/aircraft";
 import { usePersistentSet, usePersistentState } from "@/lib/persist";
+import { expiresLabel, useTfrs, type Pt } from "@/lib/tfr";
 import { useFavorites, useFlightViewCounts, useRecordView } from "@/lib/favorites";
 import { useInstallPrompt } from "@/lib/pwa";
 import { requestPinPermission, useFlightPinNotification, usePinnedFlightId } from "@/lib/pin";
@@ -73,10 +74,6 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 
-/** Shared admin unlock code — typed once per browser session. */
-const ADMIN_CODE = "qxirz8F30";
-
-
 const TITLE = "ATC365 — Live Island Radar & Flight Plans";
 const DESCRIPTION =
   "Track live aircraft across every island, file flight plans with departure and arrival times, and read ATC-published ATIS for each airport.";
@@ -108,14 +105,14 @@ function RadarPage() {
   const [acarsOpen, setAcarsOpen] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null);
+  const [drawingTfr, setDrawingTfr] = useState(false);
+  const [tfrDraft, setTfrDraft] = useState<Pt[]>([]);
+  const [selectedTfrId, setSelectedTfrId] = useState<string | null>(null);
 
   const [regionsOpen, setRegionsOpen] = useState(false);
   const [showClouds, setShowClouds] = usePersistentState("clouds", false);
   const [showRoutes, setShowRoutes] = usePersistentState("routes", true);
   const [showLabels, setShowLabels] = usePersistentState("labels", true);
-  const [adminCodeOpen, setAdminCodeOpen] = useState(false);
-  const [adminCode, setAdminCode] = useState("");
-  const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [query, setQuery] = useState("");
   const [widgets, setWidgets] = usePersistentSet<WidgetKey>("widgets", ["clock"]);
   const [hiddenCats, setHiddenCats] = usePersistentSet<CategoryKey>("hidden-categories", []);
@@ -123,24 +120,6 @@ function RadarPage() {
 
   const { canInstall, installed, install } = useInstallPrompt();
   const [pinnedId, setPinnedId] = usePinnedFlightId();
-
-  // Restore the admin unlock for this browser session.
-  useEffect(() => {
-    if (sessionStorage.getItem("atc365-admin") === "1") setAdminUnlocked(true);
-  }, []);
-
-  const submitAdminCode = () => {
-    if (adminCode.trim() !== ADMIN_CODE) {
-      toast.error("Incorrect admin code");
-      return;
-    }
-    sessionStorage.setItem("atc365-admin", "1");
-    setAdminUnlocked(true);
-    setAdminCode("");
-    setAdminCodeOpen(false);
-    setRegionsOpen(false);
-    setAdminOpen(true);
-  };
 
   const toggleWidget = (key: WidgetKey, on: boolean) =>
     setWidgets((prev: Set<WidgetKey>) => {
@@ -188,9 +167,12 @@ function RadarPage() {
   // Playback simply rewinds the radar clock; everything else follows from it.
   const clock = now + offsetMin * 60_000;
 
+  const { data: tfrs = [] } = useTfrs();
+  const selectedTfr = tfrs.find((t) => t.id === selectedTfrId) ?? null;
+
   const flights: LiveFlight[] = useMemo(() => {
     const all = plans
-      .map((p) => computeFlight(p, clock))
+      .map((p) => computeFlight(p, clock, tfrs))
       .filter((f): f is LiveFlight => !!f)
       .filter((f) => isVisibleOnRadar(f, clock))
       .filter((f) => !hiddenCats.has(categoryFor(f.plan.aircraft)));
@@ -205,7 +187,7 @@ function RadarPage() {
         (isl ? Math.hypot(f.x - isl.x, f.y - isl.y) < isl.radius * 3 : false),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plans, clock, focus, Array.from(hiddenCats).sort().join(",")]);
+  }, [plans, clock, focus, tfrs, Array.from(hiddenCats).sort().join(",")]);
 
 
   const selectedFlight = flights.find((f) => f.plan.id === selectedFlightId) ?? null;
@@ -508,21 +490,19 @@ function RadarPage() {
                   </Button>
                 </div>
 
-                <Button
-                  variant="secondary"
-                  className="mt-4 w-full gap-2"
-                  onClick={() => {
-                    if (adminUnlocked) {
+                {isAdmin && (
+                  <Button
+                    variant="secondary"
+                    className="mt-4 w-full gap-2"
+                    onClick={() => {
                       setRegionsOpen(false);
                       setAdminOpen(true);
-                    } else {
-                      setAdminCodeOpen(true);
-                    }
-                  }}
-                >
-                  <Shield className="size-4" />
-                  {adminUnlocked ? "Open admin mode" : "Admin access"}
-                </Button>
+                    }}
+                  >
+                    <Shield className="size-4" />
+                    Open admin mode
+                  </Button>
+                )}
 
               </div>
             </ScrollArea>
@@ -547,14 +527,90 @@ function RadarPage() {
           }}
           onSelectAirport={openAirport}
           onSelectIsland={(slug) => setFocus(slug)}
-          placing={placing}
+          placing={placing || drawingTfr}
+          tfrs={tfrs}
+          onSelectTfr={(id) => setSelectedTfrId(id)}
+          draftTfr={drawingTfr ? tfrDraft : undefined}
           onMapClick={(x, y) => {
+            if (drawingTfr) {
+              setTfrDraft((p) => [...p, { x, y }]);
+              return;
+            }
             setPendingPoint({ x, y });
             setPlacing(false);
             setAdminOpen(true);
             toast.success(`Position captured — ${x}, ${y}`);
           }}
         />
+
+        {drawingTfr && (
+          <div className="pointer-events-none absolute inset-x-0 top-16 z-40 flex justify-center px-3">
+            <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-destructive/60 bg-card/95 px-3 py-1.5 shadow-[var(--shadow-panel)] backdrop-blur">
+              <Crosshair className="size-4 text-destructive" />
+              <span className="font-display text-[11px] tracking-console text-foreground">
+                Tap to add points · {tfrDraft.length}
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 px-2"
+                onClick={() => setTfrDraft((p) => p.slice(0, -1))}
+              >
+                Undo
+              </Button>
+              <Button
+                size="sm"
+                className="h-6 px-2"
+                disabled={tfrDraft.length < 3}
+                onClick={() => {
+                  setDrawingTfr(false);
+                  setAdminOpen(true);
+                }}
+              >
+                Done
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 px-2"
+                onClick={() => {
+                  setDrawingTfr(false);
+                  setTfrDraft([]);
+                  setAdminOpen(true);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {selectedTfr && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-24 z-40 flex justify-center px-3">
+            <div className="deck-surface pointer-events-auto max-w-sm animate-fade-in rounded-2xl border border-destructive/40 p-3">
+              <div className="font-display text-sm tracking-console text-destructive">
+                TFR · {selectedTfr.name}
+              </div>
+              {selectedTfr.reason && (
+                <p className="mt-1 text-sm text-foreground">{selectedTfr.reason}</p>
+              )}
+              <div className="mt-1 font-mono text-[11px] text-muted-foreground">
+                {selectedTfr.min_alt}–{selectedTfr.max_alt} ft · {expiresLabel(selectedTfr, clock)}
+                {selectedTfr.allowed_callsigns.length
+                  ? ` · exempt: ${selectedTfr.allowed_callsigns.join(", ")}`
+                  : ""}
+              </div>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="mt-2 h-7"
+                onClick={() => setSelectedTfrId(null)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
 
         {placing && (
           <div className="pointer-events-none absolute inset-x-0 top-16 z-40 flex justify-center px-3">
@@ -645,11 +701,11 @@ function RadarPage() {
             icao={selectedAirport}
             flights={flights}
             canEditAtis={!!user}
-            isAdmin={isAdmin || adminUnlocked}
+            isAdmin={isAdmin}
             sessions={atcByAirport?.get(selectedAirport) ?? []}
             onEditAtis={() => setAtisOpen(true)}
             onGoOnline={() => setAtcOpen(true)}
-            onEditAirport={() => (adminUnlocked ? setAdminOpen(true) : setAdminCodeOpen(true))}
+            onEditAirport={() => setAdminOpen(true)}
             onClose={() => setSelectedAirport(null)}
             onSelectFlight={(id) => {
               setSelectedAirport(null);
@@ -735,8 +791,25 @@ function RadarPage() {
           userId={user.id}
         />
       )}
-      {(isAdmin || adminUnlocked) && (
-        <AdminDialog open={adminOpen} onOpenChange={setAdminOpen} initialIcao={selectedAirport} />
+      {isAdmin && (
+        <AdminDialog
+          open={adminOpen}
+          onOpenChange={setAdminOpen}
+          initialIcao={selectedAirport}
+          pendingPoint={pendingPoint}
+          onRequestPlace={() => {
+            setAdminOpen(false);
+            setPlacing(true);
+          }}
+          tfrDraft={tfrDraft}
+          onRequestDrawTfr={() => {
+            setAdminOpen(false);
+            setTfrDraft([]);
+            setSelectedTfrId(null);
+            setDrawingTfr(true);
+          }}
+          onClearTfrDraft={() => setTfrDraft([])}
+        />
       )}
       {user && (
         <AtisDialog
@@ -746,32 +819,6 @@ function RadarPage() {
           userId={user.id}
         />
       )}
-
-      {/* Admin code gate */}
-      <Dialog open={adminCodeOpen} onOpenChange={setAdminCodeOpen}>
-        <DialogContent className="max-w-xs">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl text-primary">Admin access</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label className="font-display text-[11px] tracking-console text-muted-foreground">
-              Access code
-            </Label>
-            <Input
-              type="password"
-              value={adminCode}
-              className="font-mono"
-              onChange={(e) => setAdminCode(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submitAdminCode()}
-            />
-          </div>
-          <DialogFooter>
-            <Button className="w-full" onClick={submitAdminCode}>
-              Unlock admin mode
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Tutorial />
     </div>
