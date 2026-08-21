@@ -79,7 +79,9 @@ const TYPE_TABLE: Record<string, { icao: string; wake: "L" | "M" | "H" | "J" }> 
   concorde: { icao: "CONC", wake: "H" },
   "supermarine walrus": { icao: "WALR", wake: "L" },
   "airship / blimp": { icao: "SHIP", wake: "L" },
-  "hot air balloon", : undefined as never,
+  "hot air balloon": { icao: "BALL", wake: "L" },
+  "santa's sleigh": { icao: "SLGH", wake: "L" },
+  glider: { icao: "GLID", wake: "L" },
 };
 
 /** Wake category from the aircraft's radar kind, used as a fallback. */
