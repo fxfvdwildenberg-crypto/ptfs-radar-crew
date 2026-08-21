@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
+
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,16 +73,17 @@ function AuthPage() {
     navigate({ to: "/" });
   };
 
-  const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error(result.error.message ?? "Google sign-in failed");
-      return;
+  // Surface an access-denied reason handed back by the Discord callback.
+  useEffect(() => {
+    const denied = new URLSearchParams(window.location.search).get("denied");
+    if (denied) {
+      toast.error(denied);
+      window.history.replaceState({}, "", window.location.pathname);
     }
-    if (result.redirected) return;
-    navigate({ to: "/" });
+  }, []);
+
+  const discord = () => {
+    window.location.href = "/api/public/auth/discord/start";
   };
 
 
@@ -154,9 +155,16 @@ function AuthPage() {
             <span className="h-px flex-1 bg-border" />
           </div>
 
-          <Button variant="secondary" className="w-full" onClick={google}>
-            Continue with Google
+          <Button
+            className="w-full bg-[#5865F2] text-white hover:bg-[#4752c4]"
+            onClick={discord}
+          >
+            Continue with Discord
           </Button>
+          <p className="mt-2 text-center text-[11px] text-muted-foreground">
+            You need the ATC365 member role in our Discord. Staff roles unlock the admin panel
+            automatically.
+          </p>
         </div>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
